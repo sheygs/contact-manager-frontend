@@ -1,5 +1,6 @@
 import { FormEvent, useContext, useState } from 'react';
 import { ToastContext } from '../../context';
+import config from '../../config';
 
 type InputChangeEvent = {
         target: {
@@ -7,6 +8,8 @@ type InputChangeEvent = {
                 value: string;
         };
 };
+
+const API_URL: string = `${config.BASE_URL}/api/v1`;
 
 export function AddContact() {
         const toastContext = useContext(ToastContext);
@@ -26,7 +29,7 @@ export function AddContact() {
         const handleSubmit = async (event: FormEvent) => {
                 event.preventDefault();
 
-                const res = await fetch(`http://localhost:3000/api/v1/contacts`, {
+                const res = await fetch(`${API_URL}/contacts`, {
                         method: 'POST',
                         headers: {
                                 'Content-Type': 'application/json',
