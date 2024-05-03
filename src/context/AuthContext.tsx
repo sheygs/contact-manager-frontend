@@ -2,6 +2,7 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { ToastContext } from './ToastContext';
 import { useNavigate } from 'react-router-dom';
+import config from '../config';
 
 type User = {
         id: string;
@@ -18,6 +19,8 @@ interface AuthContextType {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setUser: any;
 }
+
+const BASE_URL: string = `${config.BASE_URL}/api/v1`;
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -38,17 +41,14 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
                         }
 
                         try {
-                                const response = await fetch(
-                                        `http://localhost:3000/api/v1/auth/me`,
-                                        {
-                                                method: 'GET',
-                                                headers: {
-                                                        Authorization: `Bearer ${localStorage.getItem(
-                                                                'token'
-                                                        )}`,
-                                                },
-                                        }
-                                );
+                                const response = await fetch(`${BASE_URL}/auth/me`, {
+                                        method: 'GET',
+                                        headers: {
+                                                Authorization: `Bearer ${localStorage.getItem(
+                                                        'token'
+                                                )}`,
+                                        },
+                                });
 
                                 const result = await response.json();
 
@@ -83,16 +83,13 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         // login
         const login = async (requestPayload: { email: string; password: string }) => {
                 try {
-                        const response = await fetch(
-                                `http://localhost:3000/api/v1/auth/login`,
-                                {
-                                        method: 'POST',
-                                        headers: {
-                                                'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ ...requestPayload }),
-                                }
-                        );
+                        const response = await fetch(`${BASE_URL}/auth/login`, {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ ...requestPayload }),
+                        });
 
                         const result = await response.json();
 
@@ -112,16 +109,13 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         // register
         const register = async (requestPayload: { email: string; password: string }) => {
                 try {
-                        const response = await fetch(
-                                `http://localhost:3000/api/v1/auth/signup`,
-                                {
-                                        method: 'POST',
-                                        headers: {
-                                                'Content-Type': 'application/json',
-                                        },
-                                        body: JSON.stringify({ ...requestPayload }),
-                                }
-                        );
+                        const response = await fetch(`${BASE_URL}/auth/signup`, {
+                                method: 'POST',
+                                headers: {
+                                        'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ ...requestPayload }),
+                        });
 
                         const result = await response.json();
 

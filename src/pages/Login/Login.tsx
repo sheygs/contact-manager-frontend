@@ -59,7 +59,6 @@ export const Login = () => {
                                                 value={credentials.email}
                                                 onChange={handleInputChange}
                                                 placeholder="email@example.com"
-                                                // required
                                         />
                                 </div>
                                 <div className="form-group">
@@ -77,7 +76,6 @@ export const Login = () => {
                                                 value={credentials.password}
                                                 onChange={handleInputChange}
                                                 placeholder="Enter Password"
-                                                // required
                                         />
                                 </div>
                                 <input

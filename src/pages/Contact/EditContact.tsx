@@ -3,6 +3,7 @@ import { FormEvent, useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ToastContext } from '../../context';
 import { Spinner } from '../../components';
+import config from '../../config';
 
 type InputChangeEvent = {
         target: {
@@ -10,6 +11,8 @@ type InputChangeEvent = {
                 value: string;
         };
 };
+
+const API_URL: string = `${config.BASE_URL}/api/v1`;
 
 export const EditContact = () => {
         let { id } = useParams();
@@ -36,19 +39,14 @@ export const EditContact = () => {
         const handleSubmit = async (event: FormEvent) => {
                 event.preventDefault();
 
-                const response = await fetch(
-                        `http://localhost:3000/api/v1/contacts/${id}`,
-                        {
-                                method: 'PATCH',
-                                headers: {
-                                        'Content-Type': 'application/json',
-                                        Authorization: `Bearer ${localStorage.getItem(
-                                                'token'
-                                        )}`,
-                                },
-                                body: JSON.stringify(userDetails),
-                        }
-                );
+                const response = await fetch(`${API_URL}/contacts/${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        },
+                        body: JSON.stringify(userDetails),
+                });
                 const result = await response.json();
 
                 if (!result.error) {
@@ -71,7 +69,7 @@ export const EditContact = () => {
                 async function getContactByID() {
                         try {
                                 const response = await fetch(
-                                        `http://localhost:3000/api/v1/contacts/${id}`,
+                                        `${API_URL}/contacts/${id}`,
                                         {
                                                 method: 'GET',
                                                 headers: {
@@ -94,7 +92,7 @@ export const EditContact = () => {
                                         toastContext?.toast.error(result.error.message);
                                 }
                         } catch (error) {
-                           throw error;
+                                throw error;
                         }
                 }
 

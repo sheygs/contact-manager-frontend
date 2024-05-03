@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Spinner } from '../../components';
 import { ToastContext } from '../../context';
 import { Link } from 'react-router-dom';
-// import { Link } from 'react-router-dom';
+import config from '../../config';
 
 interface Contact {
         id: string;
@@ -22,6 +22,8 @@ interface ModalData {
         last_name: string;
         phone_number: string;
 }
+
+const API_URL: string = `${config.BASE_URL}/api/v1`;
 
 export const Contacts = () => {
         const toastContext = useContext(ToastContext);
@@ -41,17 +43,14 @@ export const Contacts = () => {
 
                 async function fetchContacts() {
                         try {
-                                const res = await fetch(
-                                        `http://localhost:3000/api/v1/contacts`,
-                                        {
-                                                method: 'GET',
-                                                headers: {
-                                                        Authorization: `Bearer ${localStorage.getItem(
-                                                                'token'
-                                                        )}`,
-                                                },
-                                        }
-                                );
+                                const res = await fetch(`${API_URL}/contacts`, {
+                                        method: 'GET',
+                                        headers: {
+                                                Authorization: `Bearer ${localStorage.getItem(
+                                                        'token'
+                                                )}`,
+                                        },
+                                });
                                 const result = await res.json();
 
                                 if (result.status !== 'failure' || result.code < 400) {
@@ -76,17 +75,14 @@ export const Contacts = () => {
                 if (!result) return;
 
                 try {
-                        const response = await fetch(
-                                `http://localhost:3000/api/v1/contacts/${id}`,
-                                {
-                                        method: 'DELETE',
-                                        headers: {
-                                                Authorization: `Bearer ${localStorage.getItem(
-                                                        'token'
-                                                )}`,
-                                        },
-                                }
-                        );
+                        const response = await fetch(`${API_URL}/contacts/${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                        Authorization: `Bearer ${localStorage.getItem(
+                                                'token'
+                                        )}`,
+                                },
+                        });
                         const result = await response.json();
 
                         if (result.status !== 'failure' || result.code < 400) {
