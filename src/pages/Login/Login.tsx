@@ -38,9 +38,6 @@ export const Login = () => {
                 }
 
                 authContext?.login(credentials);
-
-                // user logged on
-                // toastContext?.toast.success('user loggedin');
         };
 
         return (

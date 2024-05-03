@@ -10,6 +10,7 @@ type InputChangeEvent = {
 };
 
 type Credentials = {
+        username: string;
         email: string;
         password: string;
 };
@@ -19,6 +20,7 @@ export const Register = () => {
         const toastContext = useContext(ToastContext);
 
         const [credentials, setCredentials] = useState<Credentials>({
+                username: '',
                 email: '',
                 password: '',
         });
@@ -32,7 +34,11 @@ export const Register = () => {
         const handleSubmit = (event: FormEvent): void => {
                 event.preventDefault();
 
-                if (!credentials.email || !credentials.password) {
+                if (
+                        !credentials.username ||
+                        !credentials.email ||
+                        !credentials.password
+                ) {
                         toastContext?.toast.error('please provide all credentials');
                         return;
                 }
@@ -43,6 +49,24 @@ export const Register = () => {
         return (
                 <>
                         <form onSubmit={handleSubmit}>
+                                <div className="form-group">
+                                        <label
+                                                htmlFor="nameInput"
+                                                className="form-label mt-4"
+                                        >
+                                                Username
+                                        </label>
+                                        <input
+                                                type="text"
+                                                className="form-control"
+                                                id="userName"
+                                                aria-describedby="emailHelp"
+                                                name="username"
+                                                value={credentials.username}
+                                                onChange={handleInputChange}
+                                                placeholder="username"
+                                        />
+                                </div>
                                 <div className="form-group">
                                         <label
                                                 htmlFor="emailInput"
@@ -59,7 +83,6 @@ export const Register = () => {
                                                 value={credentials.email}
                                                 onChange={handleInputChange}
                                                 placeholder="email@example.com"
-                                                // required
                                         />
                                 </div>
                                 <div className="form-group">
@@ -77,7 +100,6 @@ export const Register = () => {
                                                 value={credentials.password}
                                                 onChange={handleInputChange}
                                                 placeholder="Enter Password"
-                                                // required
                                         />
                                 </div>
 
