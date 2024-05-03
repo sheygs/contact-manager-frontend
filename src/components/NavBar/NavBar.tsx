@@ -42,6 +42,21 @@ export const NavBar = ({ title = 'Contact Manager' }) => {
                                                 {authContext?.user ? (
                                                         <>
                                                                 {' '}
+                                                                <li className="nav-item">
+                                                                        <Link to="/contacts">
+                                                                                <a className="nav-link">
+                                                                                        All
+                                                                                        Contacts
+                                                                                </a>
+                                                                        </Link>
+                                                                </li>
+                                                                <li className="nav-item">
+                                                                        <Link to="/create">
+                                                                                <a className="nav-link">
+                                                                                        Create
+                                                                                </a>
+                                                                        </Link>
+                                                                </li>
                                                                 <li
                                                                         className="nav-item"
                                                                         onClick={
@@ -60,20 +75,14 @@ export const NavBar = ({ title = 'Contact Manager' }) => {
                                                         <>
                                                                 <li className="nav-item">
                                                                         <Link to="/login">
-                                                                                <a
-                                                                                        className="nav-link"
-                                                                                        href="#"
-                                                                                >
+                                                                                <a className="nav-link">
                                                                                         Login
                                                                                 </a>
                                                                         </Link>
                                                                 </li>
                                                                 <li className="nav-item">
                                                                         <Link to="/register">
-                                                                                <a
-                                                                                        className="nav-link"
-                                                                                        href="#"
-                                                                                >
+                                                                                <a className="nav-link">
                                                                                         Sign
                                                                                         Up
                                                                                 </a>

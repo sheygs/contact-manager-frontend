@@ -1,11 +1,20 @@
+/* eslint-disable no-useless-catch */
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { ToastContext } from './ToastContext';
 import { useNavigate } from 'react-router-dom';
 
+type User = {
+        id: string;
+        username: string;
+        email: string;
+        role: string;
+        created_at?: Date;
+        updated_at?: Date;
+};
 interface AuthContextType {
         login: (requestPayload: { email: string; password: string }) => Promise<void>;
         register: (requestPayload: { email: string; password: string }) => Promise<void>;
-        user: unknown;
+        user: User;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setUser: any;
 }
@@ -15,10 +24,19 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         const navigate = useNavigate();
         const toastContext = useContext(ToastContext);
-        const [user, setUser] = useState(null);
+        const [user, setUser] = useState<User>({
+                id: '',
+                username: '',
+                email: '',
+                role: '',
+        });
 
         useEffect(() => {
                 const checkLoggedIn = async () => {
+                        if (!localStorage.getItem('token')) {
+                                navigate('/login', { replace: true });
+                        }
+
                         try {
                                 const response = await fetch(
                                         `http://localhost:3000/api/v1/auth/me`,
@@ -35,16 +53,32 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
                                 const result = await response.json();
 
                                 if (result.status !== 'failure' || result.code < 400) {
+                                        if (
+                                                location.pathname === '/login' ||
+                                                location.pathname === '/register'
+                                        ) {
+                                                setTimeout(() => {
+                                                        navigate('/', {
+                                                                replace: true,
+                                                        });
+                                                }, 500);
+                                        } else {
+                                                navigate(
+                                                        location.pathname
+                                                                ? location.pathname
+                                                                : '/'
+                                                );
+                                        }
                                         setUser(result.data);
-                                        navigate('/', { replace: true });
+                                } else {
+                                        navigate('/login', { replace: true });
                                 }
                         } catch (error) {
-                                console.log({ error });
+                                throw error;
                         }
                 };
-
                 checkLoggedIn();
-        }, [navigate]);
+        }, []);
 
         // login
         const login = async (requestPayload: { email: string; password: string }) => {
@@ -71,7 +105,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
                                 toastContext?.toast.error(result.error.message);
                         }
                 } catch (error) {
-                        console.log({ error });
+                        throw error;
                 }
         };
 
@@ -98,7 +132,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
                                 toastContext?.toast.error(result.error.message);
                         }
                 } catch (error) {
-                        console.log({ error });
+                        throw error;
                 }
         };
 
