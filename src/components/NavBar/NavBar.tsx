@@ -1,7 +1,19 @@
-import { Link } from 'react-router-dom';
-import { NavBarList } from './NavBarList';
+import { Link, useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext, ToastContext } from '../../context';
 
 export const NavBar = ({ title = 'Contact Manager' }) => {
+        const navigate = useNavigate();
+        const authContext = useContext(AuthContext);
+        const toastContext = useContext(ToastContext);
+
+        const handleLogout = (): void => {
+                authContext?.setUser(null);
+                localStorage.clear();
+                toastContext?.toast.success('logged out');
+                navigate('/login', { replace: true });
+        };
+
         return (
                 <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
                         <div className="container-fluid">
@@ -26,7 +38,50 @@ export const NavBar = ({ title = 'Contact Manager' }) => {
                                         className="collapse navbar-collapse"
                                         id="navbarColor01"
                                 >
-                                        <NavBarList />
+                                        <ul className="navbar-nav ms-auto">
+                                                {authContext?.user ? (
+                                                        <>
+                                                                {' '}
+                                                                <li
+                                                                        className="nav-item"
+                                                                        onClick={
+                                                                                handleLogout
+                                                                        }
+                                                                >
+                                                                        <button
+                                                                                type="button"
+                                                                                className="btn btn-danger"
+                                                                        >
+                                                                                Logout
+                                                                        </button>
+                                                                </li>
+                                                        </>
+                                                ) : (
+                                                        <>
+                                                                <li className="nav-item">
+                                                                        <Link to="/login">
+                                                                                <a
+                                                                                        className="nav-link"
+                                                                                        href="#"
+                                                                                >
+                                                                                        Login
+                                                                                </a>
+                                                                        </Link>
+                                                                </li>
+                                                                <li className="nav-item">
+                                                                        <Link to="/register">
+                                                                                <a
+                                                                                        className="nav-link"
+                                                                                        href="#"
+                                                                                >
+                                                                                        Sign
+                                                                                        Up
+                                                                                </a>
+                                                                        </Link>
+                                                                </li>
+                                                        </>
+                                                )}
+                                        </ul>
                                 </div>
                         </div>
                 </nav>
