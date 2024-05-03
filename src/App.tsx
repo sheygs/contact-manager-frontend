@@ -1,15 +1,16 @@
+import { Routes as Switch, Route } from 'react-router-dom';
+import { Layout } from './components';
+import { Home, Login, Register } from './pages';
+
 function App(): JSX.Element {
         return (
-                <div
-                        style={{
-                                border: '1px solid orange',
-                                background: 'orange',
-                                margin: '20% auto',
-                                width: '50%',
-                        }}
-                >
-                        <h1 style={{ textAlign: 'center' }}>Hux Assessment Frontend</h1>
-                </div>
+                <Layout navbar={true}>
+                        <Switch>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/register" element={<Register />} />
+                        </Switch>
+                </Layout>
         );
 }
 
