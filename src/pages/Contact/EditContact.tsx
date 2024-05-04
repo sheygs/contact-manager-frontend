@@ -49,7 +49,7 @@ export const EditContact = () => {
                 });
                 const result = await response.json();
 
-                if (!result.error) {
+                if (result.status !== 'failure' || result.code < 400) {
                         toastContext?.toast.success('updated contact');
 
                         setUserDetails({
