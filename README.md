@@ -16,8 +16,8 @@ VITE_API_BASE_URL=http://localhost:{PORT}
 ### Installation
 
 ```bash
-   $ git clone https://github.com/sheygs/hux-assessment-frontend.git
-   $ cd hux-assessment-frontend
+   $ git clone https://github.com/sheygs/contact-manager-frontend.git
+   $ cd contact-manager-frontend
    $ yarn
 ```
 
