@@ -1,23 +1,32 @@
 /* eslint-disable no-useless-catch */
-import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useEffect,
+  useContext,
+} from 'react';
 import { ToastContext } from './ToastContext';
 import { useNavigate } from 'react-router-dom';
 import config from '../config';
 
 type User = {
-        id: string;
-        username: string;
-        email: string;
-        role: string;
-        created_at?: Date;
-        updated_at?: Date;
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  created_at?: Date;
+  updated_at?: Date;
 };
 interface AuthContextType {
-        login: (requestPayload: { email: string; password: string }) => Promise<void>;
-        register: (requestPayload: { email: string; password: string }) => Promise<void>;
-        user: User;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setUser: any;
+  login: (requestPayload: { email: string; password: string }) => Promise<void>;
+  register: (requestPayload: {
+    email: string;
+    password: string;
+  }) => Promise<void>;
+  user: User;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setUser: any;
 }
 
 const BASE_URL: string = `${config.BASE_URL}/api/v1`;
@@ -25,116 +34,113 @@ const BASE_URL: string = `${config.BASE_URL}/api/v1`;
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthContextProvider = ({ children }: { children: ReactNode }) => {
-        const navigate = useNavigate();
-        const toastContext = useContext(ToastContext);
-        const [user, setUser] = useState<User>({
-                id: '',
-                username: '',
-                email: '',
-                role: '',
+  const navigate = useNavigate();
+  const toastContext = useContext(ToastContext);
+  const [user, setUser] = useState<User>({
+    id: '',
+    username: '',
+    email: '',
+    role: '',
+  });
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      if (!localStorage.getItem('token')) {
+        navigate('/login', { replace: true });
+      }
+
+      try {
+        const response = await fetch(`${BASE_URL}/auth/me`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         });
 
-        useEffect(() => {
-                const checkLoggedIn = async () => {
-                        if (!localStorage.getItem('token')) {
-                                navigate('/login', { replace: true });
-                        }
+        const result = await response.json();
 
-                        try {
-                                const response = await fetch(`${BASE_URL}/auth/me`, {
-                                        method: 'GET',
-                                        headers: {
-                                                Authorization: `Bearer ${localStorage.getItem(
-                                                        'token'
-                                                )}`,
-                                        },
-                                });
+        if (result.status !== 'failure' || result.code < 400) {
+          if (
+            location.pathname === '/login' ||
+            location.pathname === '/register'
+          ) {
+            setTimeout(() => {
+              navigate('/', {
+                replace: true,
+              });
+            }, 500);
+          } else {
+            navigate(location.pathname ? location.pathname : '/');
+          }
+          setUser(result.data);
+        } else {
+          navigate('/login', { replace: true });
+        }
+      } catch (error) {
+        throw error;
+      }
+    };
+    checkLoggedIn();
+  }, []);
 
-                                const result = await response.json();
+  // login
+  const login = async (requestPayload: { email: string; password: string }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...requestPayload }),
+      });
 
-                                if (result.status !== 'failure' || result.code < 400) {
-                                        if (
-                                                location.pathname === '/login' ||
-                                                location.pathname === '/register'
-                                        ) {
-                                                setTimeout(() => {
-                                                        navigate('/', {
-                                                                replace: true,
-                                                        });
-                                                }, 500);
-                                        } else {
-                                                navigate(
-                                                        location.pathname
-                                                                ? location.pathname
-                                                                : '/'
-                                                );
-                                        }
-                                        setUser(result.data);
-                                } else {
-                                        navigate('/login', { replace: true });
-                                }
-                        } catch (error) {
-                                throw error;
-                        }
-                };
-                checkLoggedIn();
-        }, []);
+      const result = await response.json();
 
-        // login
-        const login = async (requestPayload: { email: string; password: string }) => {
-                try {
-                        const response = await fetch(`${BASE_URL}/auth/login`, {
-                                method: 'POST',
-                                headers: {
-                                        'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ ...requestPayload }),
-                        });
+      if (result.status !== 'failure' || result.code < 400) {
+        localStorage.setItem('token', result.data.token);
+        setUser(result.data.user);
+        toastContext?.toast.success('User logged In');
+        navigate('/', { replace: true });
+      } else {
+        toastContext?.toast.error(result.error.message);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
-                        const result = await response.json();
+  // register
+  const register = async (requestPayload: {
+    email: string;
+    password: string;
+  }) => {
+    try {
+      const response = await fetch(`${BASE_URL}/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...requestPayload }),
+      });
 
-                        if (result.status !== 'failure' || result.code < 400) {
-                                localStorage.setItem('token', result.data.token);
-                                setUser(result.data.user);
-                                toastContext?.toast.success('User logged In');
-                                navigate('/', { replace: true });
-                        } else {
-                                toastContext?.toast.error(result.error.message);
-                        }
-                } catch (error) {
-                        throw error;
-                }
-        };
+      const result = await response.json();
 
-        // register
-        const register = async (requestPayload: { email: string; password: string }) => {
-                try {
-                        const response = await fetch(`${BASE_URL}/auth/signup`, {
-                                method: 'POST',
-                                headers: {
-                                        'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ ...requestPayload }),
-                        });
+      if (result.status !== 'failure' || result.code < 400) {
+        toastContext?.toast.success('User registered');
+        navigate('/login', { replace: true });
+      } else {
+        toastContext?.toast.error(result.error.message);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
-                        const result = await response.json();
-
-                        if (result.status !== 'failure' || result.code < 400) {
-                                toastContext?.toast.success('User registered');
-                                navigate('/login', { replace: true });
-                        } else {
-                                toastContext?.toast.error(result.error.message);
-                        }
-                } catch (error) {
-                        throw error;
-                }
-        };
-
-        return (
-                <AuthContext.Provider value={{ login, register, user, setUser }}>
-                        {children}
-                </AuthContext.Provider>
-        );
+  return (
+    <AuthContext.Provider value={{ login, register, user, setUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export { AuthContext, AuthContextProvider };
